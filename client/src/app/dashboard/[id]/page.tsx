@@ -1,4 +1,4 @@
-/*this file is a page that displays the details of a specific interview kit. It fetches the kit data from the server using the kit ID from the URL parameters and displays various sections such as coverage, company brief, job skills, roadmap, and flashcards. It also provides a delete button to remove the kit.*/
+/*this file is a page that displays the details of a specific Interview Kit. It fetches the kit data from the server using the kit ID from the URL parameters and displays various sections such as coverage, company brief, job skills, roadmap, and flashcards. It also provides a delete button to remove the kit from the user's dashboard.*/
 
 "use client";
 
@@ -10,8 +10,6 @@ import CoverageCard from "@/components/CoverageCard";
 import CompanyBriefCard from "@/components/CompanyBriefCard";
 import RoadmapCard from "@/components/RoadmapCard";
 import FlashcardCard from "@/components/FlashcardCard";
-
-import { useRouter } from "next/navigation";
 
 interface RoadmapDay {
   day: number;
@@ -84,9 +82,7 @@ export default function KitDetails() {
 
     try {
       await api.delete(`/kits/${params.id}`);
-
       alert("Interview Kit deleted successfully!");
-
       router.push("/dashboard");
     } catch (err: any) {
       alert(err.response?.data?.message || "Delete failed");
@@ -114,7 +110,6 @@ export default function KitDetails() {
   return (
     <main className="min-h-screen bg-slate-950 text-white p-8">
       <div className="max-w-5xl mx-auto space-y-8">
-
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
@@ -122,9 +117,7 @@ export default function KitDetails() {
               AI Interview Kit
             </p>
 
-            <h1 className="text-3xl font-bold mt-2">
-              {kit.companyUrl}
-            </h1>
+            <h1 className="text-3xl font-bold mt-2">{kit.companyUrl}</h1>
 
             <div className="flex gap-3 mt-4">
               <span className="bg-blue-600 px-3 py-1 rounded-full text-sm">
@@ -162,9 +155,7 @@ export default function KitDetails() {
 
         {/* Job Skills */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Extracted Job Skills
-          </h2>
+          <h2 className="text-xl font-semibold mb-4">Extracted Job Skills</h2>
 
           <div className="flex flex-wrap gap-2">
             {kit.parsedSkills.map((skill) => (
@@ -183,7 +174,6 @@ export default function KitDetails() {
 
         {/* Flashcards */}
         <FlashcardCard flashcards={kit.flashcards || []} />
-
       </div>
     </main>
   );
