@@ -1,5 +1,3 @@
-/*this file contains the authentication controller for the InterviewKit AI application. It provides functions for user registration, login, and logout. The register function creates a new user with hashed password and generates a JWT token, which is sent as an HTTP-only cookie. The login function verifies user credentials, generates a JWT token upon successful authentication, and sends it as an HTTP-only cookie. The logout function clears the authentication cookie. The controller uses bcryptjs for password hashing and jsonwebtoken for token generation and verification.*/
-
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -8,6 +6,14 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
+};
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 exports.register = async (req, res) => {
@@ -33,13 +39,7 @@ exports.register = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: false,
-      path: "/",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+    res.cookie("token", token, cookieOptions);
 
     res.status(201).json({
       success: true,
@@ -50,12 +50,13 @@ exports.register = async (req, res) => {
       },
     });
   } catch (error) {
-  console.error(error);
-  res.status(500).json({
-    success: false,
-    message: error.message,
-  });
-}
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 exports.login = async (req, res) => {
@@ -82,13 +83,7 @@ exports.login = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: false,
-       path: "/",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("token", token, cookieOptions);
 
     res.json({
       success: true,
@@ -99,16 +94,22 @@ exports.login = async (req, res) => {
       },
     });
   } catch (error) {
-  console.error(error);
-  res.status(500).json({
-    success: false,
-    message: error.message,
-  });
-}
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 exports.logout = (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
 
   res.json({
     success: true,
