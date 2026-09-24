@@ -1,11 +1,10 @@
-/*this component is responsible for rendering the main dashboard page of the InterviewKit AI application. It allows users to upload their resume, create new interview kits based on job descriptions, and view a list of their existing interview kits. The component manages state for job description, company URL, preparation days, and the user's resume profile. It fetches the user's interview kits and resume profile from the server and provides functionality to upload or replace the resume. The component uses Tailwind CSS for styling and handles loading states and error messages during API requests. */
-
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import api from "@/services/api";
-import FlashcardCard from "@/components/FlashcardCard";
+import { useAuth } from "@/context/AuthContext";
 
 interface Kit {
   _id: string;
@@ -23,6 +22,9 @@ interface ResumeProfile {
 }
 
 export default function Dashboard() {
+  const router = useRouter();
+  const { user, loading: authLoading, logout } = useAuth();
+
   const [jobDescription, setJobDescription] = useState("");
   const [companyUrl, setCompanyUrl] = useState("");
   const [preparationDays, setPreparationDays] = useState(7);
@@ -55,10 +57,20 @@ export default function Dashboard() {
     }
   };
 
+  // Protect dashboard
   useEffect(() => {
-    fetchKits();
-    fetchResume();
-  }, []);
+    if (!authLoading && !user) {
+      router.replace("/login");
+    }
+  }, [authLoading, user, router]);
+
+  // Load data after authentication
+  useEffect(() => {
+    if (user) {
+      fetchKits();
+      fetchResume();
+    }
+  }, [user]);
 
   const handleResumeUpload = async () => {
     if (!resumeFile) return alert("Please select a resume PDF");
@@ -118,22 +130,41 @@ export default function Dashboard() {
     }
   };
 
+  if (authLoading) {
+    return (
+      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        Loading session...
+      </main>
+    );
+  }
+
+  if (!user) return null;
+
   return (
     <main className="min-h-screen bg-slate-950 text-white p-8">
       <div className="max-w-5xl mx-auto">
-
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold">InterviewKit AI</h1>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold">InterviewKit AI</h1>
+            <p className="text-slate-400 mt-1">
+              Welcome back, {user.name}
+            </p>
+          </div>
 
-          <p className="text-slate-400 mt-1">
-            AI-powered interview preparation with resume matching.
-          </p>
+          <button
+            onClick={async () => {
+              await logout();
+              router.replace("/login");
+            }}
+            className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl font-semibold"
+          >
+            Logout
+          </button>
         </div>
 
         {/* Resume Section */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-8">
-
           {!resume ? (
             <>
               <h2 className="text-xl font-semibold mb-2">
@@ -318,7 +349,6 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-
       </div>
     </main>
   );

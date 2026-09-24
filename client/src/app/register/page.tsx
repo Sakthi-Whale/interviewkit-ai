@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/services/api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -17,14 +19,14 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await api.post("/auth/register", {
+      await api.post("/auth/register", {
         name,
         email,
         password,
       });
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      // Load authenticated user from HttpOnly cookie
+      await refreshUser();
 
       router.push("/dashboard");
     } catch (err: any) {
@@ -37,12 +39,18 @@ export default function RegisterPage() {
   return (
     <main className="min-h-screen bg-slate-950 flex items-center justify-center px-6">
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-        <p className="text-slate-400 mb-8">Start building your Interview Kits</p>
+        <h1 className="text-3xl font-bold text-white mb-2">
+          Create Account
+        </h1>
+        <p className="text-slate-400 mb-8">
+          Start building your Interview Kits
+        </p>
 
         <form onSubmit={handleRegister} className="space-y-5">
           <div>
-            <label className="text-sm text-slate-300">Full Name</label>
+            <label className="text-sm text-slate-300">
+              Full Name
+            </label>
             <input
               type="text"
               required
@@ -53,7 +61,9 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="text-sm text-slate-300">Email</label>
+            <label className="text-sm text-slate-300">
+              Email
+            </label>
             <input
               type="email"
               required
@@ -64,7 +74,9 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="text-sm text-slate-300">Password</label>
+            <label className="text-sm text-slate-300">
+              Password
+            </label>
             <input
               type="password"
               required
