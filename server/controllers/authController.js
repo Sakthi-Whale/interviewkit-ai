@@ -103,6 +103,32 @@ exports.login = async (req, res) => {
   }
 };
 
+// NEW: Get current authenticated user
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 exports.logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,

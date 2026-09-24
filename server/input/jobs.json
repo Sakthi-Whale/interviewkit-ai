@@ -1,0 +1,12 @@
+[
+  {
+    "company": "Printerpix",
+    "days": 7,
+    "jobDescription": "Python, Machine Learning, REST API, MongoDB, React"
+  },
+  {
+    "company": "Quantum Loop AI",
+    "days": 5,
+    "jobDescription": "LLM, RAG, LangChain, FastAPI, Vector Database"
+  }
+]

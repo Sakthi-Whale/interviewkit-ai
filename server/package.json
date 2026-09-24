@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "test": "echo \"No tests yet\""
+    "evaluate": "node scripts/evaluate.js"
   },
   "keywords": [
     "express",

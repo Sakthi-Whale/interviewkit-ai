@@ -1,0 +1,28 @@
+[
+  {
+    "company": "Printerpix",
+    "coverage": 80,
+    "covered": [
+      "Python",
+      "Machine Learning",
+      "MongoDB",
+      "React"
+    ],
+    "missing": [
+      "REST API"
+    ]
+  },
+  {
+    "company": "Quantum Loop AI",
+    "coverage": 40,
+    "covered": [
+      "RAG",
+      "LangChain"
+    ],
+    "missing": [
+      "LLM",
+      "FastAPI",
+      "Vector Database"
+    ]
+  }
+]
